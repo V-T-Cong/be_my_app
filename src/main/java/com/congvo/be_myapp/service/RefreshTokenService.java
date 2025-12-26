@@ -6,6 +6,7 @@ import com.congvo.be_myapp.repository.RefreshTokenRepository;
 import com.congvo.be_myapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -26,7 +27,7 @@ public class RefreshTokenService {
     }
 
     public String getRefreshToken(UUID userId) {
-        User user = userRepository.findById(userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(user);
@@ -48,6 +49,11 @@ public class RefreshTokenService {
             throw new RuntimeException("Refresh token was expired. Please make a new signing request");
         }
         return token;
+    }
+
+    @Transactional
+    public void deleteRefreshToken(String token) {
+        refreshTokenRepository.deleteByToken(token);
     }
 
 }

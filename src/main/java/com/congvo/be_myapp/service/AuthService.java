@@ -9,6 +9,7 @@ import com.congvo.be_myapp.repository.PasswordResetTokenRepository;
 import com.congvo.be_myapp.repository.RoleRepository;
 import com.congvo.be_myapp.repository.UserRepository;
 import com.congvo.be_myapp.util.JwtUtil;
+import com.congvo.be_myapp.util.StringUtil;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +25,7 @@ import java.util.UUID;
 public class AuthService {
 
     private final JwtUtil jwtUtil;
+    private final StringUtil stringUtil;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -37,7 +39,8 @@ public class AuthService {
                        @Lazy AuthenticationManager authenticationManager,
                        RoleRepository roleRepository,
                        PasswordResetTokenRepository passwordResetTokenRepository,
-                       EmailService emailService
+                       EmailService emailService,
+                       StringUtil stringUtil
     ) {
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
@@ -46,6 +49,7 @@ public class AuthService {
         this.roleRepository = roleRepository;
         this.emailService = emailService;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.stringUtil = stringUtil;
     }
 
     public String register(SignUpRequest signUpRequest) {
@@ -55,6 +59,10 @@ public class AuthService {
         }
         if (userRepository.existsByPhoneNumber(signUpRequest.getPhoneNumber())) {
             throw new RuntimeException("Error: phone number is already in use!");
+        }
+
+        if (!stringUtil.isValidPassword(signUpRequest.getPassword())) {
+            throw new RuntimeException("Error: Password must be at least 8 characters long!");
         }
 
         User user = new User();
@@ -109,6 +117,10 @@ public class AuthService {
     }
 
     public String resetPassword(String token, String newPassword) {
+        if (!stringUtil.isValidPassword(newPassword)) {
+            throw new RuntimeException("Error: Password must be at least 8 characters long!");
+        }
+
         PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Invalid token"));
 
