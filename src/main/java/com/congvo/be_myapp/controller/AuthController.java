@@ -1,16 +1,16 @@
 package com.congvo.be_myapp.controller;
 
 import com.congvo.be_myapp.dto.request.*;
-import com.congvo.be_myapp.dto.response.LoginResponse;
+import com.congvo.be_myapp.dto.response.JwtResponse;
 import com.congvo.be_myapp.entity.RefreshToken;
 import com.congvo.be_myapp.service.AuthService;
 import com.congvo.be_myapp.service.RefreshTokenService;
 import com.congvo.be_myapp.service.UserService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -35,24 +35,37 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> loginUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
         String accessToken = authService.login(loginRequest);
         UUID uuid = userService.getUserID(loginRequest.getEmail());
         String refreshToken = refreshTokenService.getRefreshToken(uuid);
-        return ResponseEntity.ok(new LoginResponse(accessToken, refreshToken, loginRequest.getEmail()));
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(14 * 24 * 60 * 60)
+                .sameSite("Strict")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .body(new JwtResponse(accessToken));
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest request) {
-        String requestRefreshToken = request.getRefreshToken();
+    public ResponseEntity<?> refreshToken(@CookieValue(name = "refreshToken", defaultValue = "") String refreshToken) {
+        if (refreshToken.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No Refresh Token provided");
+        }
 
-        return refreshTokenService.findByToken(requestRefreshToken)
+        return refreshTokenService.findByToken(refreshToken)
                 .map(refreshTokenService::verifyExpiration)
                 .map(RefreshToken::getUser)
                 .map(user -> {
                     String newAccessToken = authService.generateTokenOnly(user.getEmail());
-                    String newRefreshToken = refreshTokenService.getRefreshToken(user.getId());
-                    return ResponseEntity.ok(new LoginResponse(newAccessToken, newRefreshToken, user.getEmail()));
+//                    String newRefreshToken = refreshTokenService.getRefreshToken(user.getId());
+                    return ResponseEntity.ok(new JwtResponse(newAccessToken));
                 })
                 .orElseThrow(() -> new RuntimeException("Refresh token is not in database!"));
     }

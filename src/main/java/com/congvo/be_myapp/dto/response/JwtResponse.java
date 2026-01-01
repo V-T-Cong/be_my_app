@@ -7,17 +7,15 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginResponse {
+public class JwtResponse {
 
     private String accessToken;
-    private String refreshToken;
+//    private String refreshToken;
     private String type = "Bearer";
-    private String email;
+//    private String email;
 
-    public LoginResponse(String accessToken, String refreshToken, String email) {
+    public JwtResponse(String accessToken) {
         this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
-        this.email = email;
         this.type = "Bearer";
     }
 }
