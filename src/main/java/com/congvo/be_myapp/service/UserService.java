@@ -5,7 +5,6 @@ import com.congvo.be_myapp.dto.response.UserResponse;
 import com.congvo.be_myapp.entity.Role;
 import com.congvo.be_myapp.entity.User;
 import com.congvo.be_myapp.repository.UserRepository;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,7 +24,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, @Lazy PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -83,13 +82,12 @@ public class UserService implements UserDetailsService {
 
     public void changePassword(String email, ChangePasswordRequest changePassword) {
         User user =  userRepository.findByEmail(email);
-
         if (user == null) {
             throw new RuntimeException("User not found");
         }
 
         if (passwordEncoder.matches(changePassword.getNewPassword(), user.getPassword())) {
-            throw new RuntimeException("Wrong current password!");
+            throw new RuntimeException("New password cannot be the same as the old password!");
         }
 
         if (!changePassword.getNewPassword().equals(changePassword.getConfirmationPassword())) {
