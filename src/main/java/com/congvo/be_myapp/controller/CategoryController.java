@@ -1,12 +1,13 @@
 package com.congvo.be_myapp.controller;
 
-import java.util.List;
-import java.util.UUID;
 import com.congvo.be_myapp.dto.request.CategoryRequest;
 import com.congvo.be_myapp.entity.Category;
 import com.congvo.be_myapp.service.CategoryService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -19,8 +20,10 @@ public class CategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Category>> getAllCategories() {
-        return ResponseEntity.ok(categoryService.getAllCategories());
+    public ResponseEntity<Page<Category>> getAllCategories(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(categoryService.getCategoriesPaginated(page, size));
     }
 
     @GetMapping("/{id}")
@@ -36,5 +39,11 @@ public class CategoryController {
     @PatchMapping("/{id}")
     public ResponseEntity<Category> updateCategory(@PathVariable UUID id, @RequestBody CategoryRequest categoryRequest) {
         return ResponseEntity.ok(categoryService.updateCategory(id, categoryRequest));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteCategory(@PathVariable UUID id) {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.ok("Category deleted successfully");
     }
 }

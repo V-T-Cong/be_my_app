@@ -3,6 +3,10 @@ package com.congvo.be_myapp.service;
 import com.congvo.be_myapp.dto.request.CategoryRequest;
 import com.congvo.be_myapp.entity.Category;
 import com.congvo.be_myapp.repository.CategoryRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -57,5 +61,17 @@ public class CategoryService {
         }
 
         return categoryRepository.save(category);
+    }
+
+    public void deleteCategory(UUID id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
+
+        categoryRepository.delete(category);
+    }
+
+    public Page<Category> getCategoriesPaginated(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return categoryRepository.findAll(pageable);
     }
 }
