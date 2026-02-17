@@ -2,6 +2,8 @@ package com.congvo.be_myapp.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.util.*;
 
 @Entity
@@ -28,6 +30,9 @@ public class Product extends BaseEntity {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductVariant> variants = new ArrayList<>();
+
+    @Column(precision = 5, scale = 2)
+    private BigDecimal discountPercent;
 
     @ManyToMany
     @JoinTable(

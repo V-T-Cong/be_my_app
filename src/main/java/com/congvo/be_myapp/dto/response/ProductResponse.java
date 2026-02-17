@@ -20,6 +20,8 @@ public class ProductResponse {
     private String slug;
     private String description;
     private String thumbnailUrl;
+    private BigDecimal finalPrice;
+    private String discountLabel;
     private List<VariantDTO> variants;
 
     public ProductResponse(Product product) {

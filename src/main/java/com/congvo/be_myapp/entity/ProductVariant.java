@@ -28,6 +28,11 @@ public class ProductVariant extends BaseEntity {
 
     private String variantName;
 
+    @Column(nullable = false)
+    private boolean isActive = true;
+
+    private BigDecimal discountPrice;
+
     // Helper to calculate stock quickly without joining the inventory table every time
     // You would update this count whenever InventoryItem is added/sold
     private int stockQuantity = 0;

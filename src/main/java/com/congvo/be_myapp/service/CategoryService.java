@@ -65,8 +65,14 @@ public class CategoryService {
         categoryRepository.delete(category);
     }
 
-    public Page<Category> getCategoriesPaginated(int page, int size) {
+    public Page<Category> getCategoriesPaginated(int page, int size, String search) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        if (search != null && !search.isEmpty()) {
+            return categoryRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+                    search, search, pageable);
+        }
+
         return categoryRepository.findAll(pageable);
     }
 }
