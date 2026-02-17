@@ -22,8 +22,9 @@ public class CategoryController {
     @GetMapping
     public ResponseEntity<Page<Category>> getAllCategories(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(categoryService.getCategoriesPaginated(page, size));
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search) {
+        return ResponseEntity.ok(categoryService.getCategoriesPaginated(page, size, search));
     }
 
     @GetMapping("/{id}")

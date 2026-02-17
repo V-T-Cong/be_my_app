@@ -33,8 +33,8 @@ public class SecurityConfig {
                                 "/test-email",
                                 "/api/auth/forgot-password",
                                 "/api/auth/reset-password",
-                                "/api/products",
-                                "/api/categories/**"
+                                "/api/products"
+//                                "/api/categories/**"
                         ).permitAll()
                         // Allow Auth endpoints
                         .requestMatchers("/api/auth/**").permitAll()
