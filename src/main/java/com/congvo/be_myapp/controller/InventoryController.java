@@ -3,10 +3,12 @@ package com.congvo.be_myapp.controller;
 
 import com.congvo.be_myapp.dto.request.InventoryAddRequest;
 import com.congvo.be_myapp.dto.request.InventoryUpdateRequest;
+import com.congvo.be_myapp.dto.response.InventoryItemResponse;
 import com.congvo.be_myapp.service.InventoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -19,12 +21,18 @@ public class InventoryController {
         this.inventoryService = inventoryService;
     }
 
+    @GetMapping("/variant/{variantId}")
+    public ResponseEntity<List<InventoryItemResponse>> inventoryItemVariant(@PathVariable UUID variantId) {
+        List<InventoryItemResponse> response = inventoryService.getInventoryByVariant(variantId);
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping("/add")
     public ResponseEntity<String> addInventory(@RequestBody InventoryAddRequest request) {
         inventoryService.addInventoryItems(request);
         return ResponseEntity.ok("Successfully added " + request.getSecretValues().size() + " items to inventory.");
     }
+
 
     // @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PatchMapping("/{id}")

@@ -2,6 +2,7 @@ package com.congvo.be_myapp.service;
 
 import com.congvo.be_myapp.dto.request.InventoryAddRequest;
 import com.congvo.be_myapp.dto.request.InventoryUpdateRequest;
+import com.congvo.be_myapp.dto.response.InventoryItemResponse;
 import com.congvo.be_myapp.emuns.InventoryStatus;
 import com.congvo.be_myapp.entity.InventoryItem;
 import com.congvo.be_myapp.entity.ProductVariant;
@@ -24,6 +25,17 @@ public class InventoryService {
                             ProductVariantRepository variantRepository) {
         this.inventoryItemRepository = inventoryItemRepository;
         this.variantRepository = variantRepository;
+    }
+
+
+    public List<InventoryItemResponse> getInventoryByVariant(UUID variantId) {
+        if (!variantRepository.existsById(variantId)) {
+            throw new RuntimeException("Product Variant not found");
+        }
+
+        List<InventoryItem> items = inventoryItemRepository.findByVariantId(variantId);
+
+        return items.stream().map(InventoryItemResponse::new).toList();
     }
 
 
