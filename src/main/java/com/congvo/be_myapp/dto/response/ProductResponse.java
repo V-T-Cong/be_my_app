@@ -18,6 +18,7 @@ public class ProductResponse {
     private UUID id;
     private String name;
     private String slug;
+    private boolean active;
     private String description;
     private String thumbnailUrl;
     private BigDecimal finalPrice;
@@ -28,6 +29,7 @@ public class ProductResponse {
         this.id = product.getId();
         this.name = product.getName();
         this.slug = product.getSlug();
+        this.active = product.isActive();
         this.description = product.getDescription();
         this.thumbnailUrl = product.getThumbnailUrl();
         this.variants = product.getVariants().stream()
@@ -38,6 +40,7 @@ public class ProductResponse {
                     dto.setPrice(variant.getPrice());
                     dto.setVariantName(variant.getVariantName());
                     dto.setStockQuantity(variant.getStockQuantity());
+                    dto.setActive(variant.isActive());
                     return dto;
                 }).toList();
     }
@@ -49,5 +52,6 @@ public class ProductResponse {
         private BigDecimal price;
         private String variantName;
         private int stockQuantity;
+        private boolean active;
     }
 }

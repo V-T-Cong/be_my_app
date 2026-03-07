@@ -1,6 +1,8 @@
 package com.congvo.be_myapp.controller;
 
 import com.congvo.be_myapp.dto.request.ProductRequest;
+import com.congvo.be_myapp.dto.request.VariantRequest;
+import com.congvo.be_myapp.dto.request.VariantStatusRequest;
 import com.congvo.be_myapp.dto.response.ProductResponse;
 import com.congvo.be_myapp.entity.Product;
 import com.congvo.be_myapp.repository.ProductRepository;
@@ -9,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @RestController
@@ -36,6 +39,26 @@ public class ProductController {
     public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest request) {
         ProductResponse response = productService.createProduct(request);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{productId}/variants")
+    public ResponseEntity<ProductResponse> addVariantToProduct(
+            @PathVariable UUID productId,
+            @RequestBody VariantRequest request) {
+
+        ProductResponse response = productService.addVariantToProduct(productId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/variants/{variantId}/status")
+    public ResponseEntity<String> updateVariantStatus(
+            @PathVariable UUID variantId,
+            @RequestBody VariantStatusRequest request) {
+
+        productService.updateVariantStatus(variantId, request.isActive());
+
+        String statusMessage = request.isActive() ? "activated" : "deactivated";
+        return ResponseEntity.ok("Product variant has been " + statusMessage + " successfully.");
     }
 
 }
