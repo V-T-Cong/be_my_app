@@ -1,6 +1,7 @@
 package com.congvo.be_myapp.service;
 
 import com.congvo.be_myapp.dto.request.ProductRequest;
+import com.congvo.be_myapp.dto.request.VariantRequest;
 import com.congvo.be_myapp.dto.response.ProductResponse;
 import com.congvo.be_myapp.emuns.ProductType;
 import com.congvo.be_myapp.entity.Category;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class ProductService {
@@ -58,13 +60,13 @@ public class ProductService {
         Product savedProduct = productRepository.save(product);
 
         if (productRequest.getVariants() != null && !productRequest.getVariants().isEmpty()) {
-            List<ProductVariant> variants = productRequest.getVariants().stream().map(vReq -> {
+            List<ProductVariant> variants = productRequest.getVariants().stream().map(variantRequest -> {
                 ProductVariant variant = new ProductVariant();
                 variant.setProduct(savedProduct);
-                variant.setType(ProductType.valueOf(vReq.getType().toUpperCase()));
-                variant.setPrice(vReq.getPrice());
-                variant.setVariantName(vReq.getVariantName());
-                variant.setDiscountPrice(vReq.getDiscountPrice());
+                variant.setType(ProductType.valueOf(variantRequest.getType().toUpperCase()));
+                variant.setPrice(variantRequest.getPrice());
+                variant.setVariantName(variantRequest.getVariantName());
+                variant.setDiscountPrice(variantRequest.getDiscountPrice());
                 variant.setActive(true);
                 variant.setStockQuantity(0);
                 return variant;
@@ -77,4 +79,36 @@ public class ProductService {
         return new ProductResponse(savedProduct);
     }
 
+
+    @Transactional
+    public ProductResponse addVariantToProduct(UUID productId, VariantRequest variantRequest) {
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+
+        ProductVariant variant = new ProductVariant();
+        variant.setProduct(product);
+        variant.setType(ProductType.valueOf(variantRequest.getType().toUpperCase()));
+        variant.setPrice(variantRequest.getPrice());
+        variant.setVariantName(variantRequest.getVariantName());
+        variant.setDiscountPrice(variantRequest.getDiscountPrice());
+        variant.setActive(true);
+        variant.setStockQuantity(0);
+
+        variantRepository.save(variant);
+
+        product.getVariants().add(variant);
+
+        return new ProductResponse(product);
+    }
+
+    @Transactional
+    public void updateVariantStatus(UUID variantId, boolean isActive) {
+        ProductVariant variant = variantRepository.findById(variantId)
+                .orElseThrow(() -> new RuntimeException("Product Variant not found with id: " + variantId));
+
+        variant.setActive(isActive);
+
+        variantRepository.save(variant);
+    }
 }
