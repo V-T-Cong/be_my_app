@@ -35,6 +35,13 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{productID}")
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable UUID productID) {
+        Product product = productRepository.findById(productID)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productID));
+        return ResponseEntity.ok(new ProductResponse(product));
+    }
+
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest request) {
         ProductResponse response = productService.createProduct(request);
