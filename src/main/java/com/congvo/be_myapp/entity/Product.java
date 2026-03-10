@@ -24,15 +24,15 @@ public class Product extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(precision = 5, scale = 2)
+    private BigDecimal discountPercent;
+
     private String thumbnailUrl;
 
     private boolean isActive = true;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductVariant> variants = new ArrayList<>();
-
-    @Column(precision = 5, scale = 2)
-    private BigDecimal discountPercent;
 
     @ManyToMany
     @JoinTable(

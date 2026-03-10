@@ -1,5 +1,6 @@
 package com.congvo.be_myapp.dto.response;
 
+import com.congvo.be_myapp.entity.Category;
 import com.congvo.be_myapp.entity.Product;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -22,6 +24,7 @@ public class ProductResponse {
     private String description;
     private String thumbnailUrl;
     private BigDecimal discountPercent;
+    private Set<Category> categories;
     private List<VariantDTO> variants;
 
     public ProductResponse(Product product) {
@@ -32,6 +35,7 @@ public class ProductResponse {
         this.description = product.getDescription();
         this.thumbnailUrl = product.getThumbnailUrl();
         this.discountPercent = product.getDiscountPercent();
+        this.categories = product.getCategories();
         this.variants = product.getVariants().stream()
                 .map(variant -> {
                     VariantDTO dto = new VariantDTO();
