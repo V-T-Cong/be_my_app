@@ -37,4 +37,26 @@ public class ProductVariant extends BaseEntity {
     // You would update this count whenever InventoryItem is added/sold
     private int stockQuantity = 0;
 
+    public void sellItem() {
+        if (this.stockQuantity <= 0) {
+            throw new IllegalStateException("Cannot sell: Out of stock!");
+        }
+        this.stockQuantity--;
+    }
+
+    public void restockItem() {
+        this.stockQuantity++;
+    }
+
+    public void increaseStock() {
+        this.stockQuantity++;
+    }
+
+    public void decreaseStock() {
+        if (this.stockQuantity <= 0) {
+            throw new IllegalStateException("Cannot decrease stock: already at zero.");
+        }
+        this.stockQuantity--;
+    }
+
 }

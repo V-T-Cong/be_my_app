@@ -41,6 +41,14 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+    @PatchMapping("/{productID}")
+    public ResponseEntity<ProductResponse> updateProduct(
+            @PathVariable UUID productID,
+            @RequestBody ProductRequest productRequest) {
+        ProductResponse response = productService.updateProduct(productID, productRequest);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/{productId}/variants")
     public ResponseEntity<ProductResponse> addVariantToProduct(
             @PathVariable UUID productId,

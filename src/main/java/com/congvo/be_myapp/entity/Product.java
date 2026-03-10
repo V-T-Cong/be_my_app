@@ -42,4 +42,13 @@ public class Product extends BaseEntity {
     )
     private Set<Category> categories = new HashSet<>();
 
+
+    public void addVariant(ProductVariant productVariant) {
+        if (this.variants == null) {
+            this.variants = new ArrayList<>();
+        }
+        this.variants.add(productVariant);
+        productVariant.setProduct(this);
+    }
+
 }

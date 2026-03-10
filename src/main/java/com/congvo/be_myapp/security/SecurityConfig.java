@@ -28,13 +28,11 @@ public class SecurityConfig {
                         // Allow Swagger UI and API Docs
                         .requestMatchers(
                                 "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
+                                "/scalar/**",
                                 "/test-email",
                                 "/api/auth/forgot-password",
                                 "/api/auth/reset-password",
                                 "/api/products"
-//                                "/api/categories/**"
                         ).permitAll()
                         // Allow Auth endpoints
                         .requestMatchers("/api/auth/**").permitAll()

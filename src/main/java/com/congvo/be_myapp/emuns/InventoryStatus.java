@@ -5,4 +5,5 @@ public enum InventoryStatus {
     AVAILABLE,
     SOLD,
     LOCKED,
+
 }

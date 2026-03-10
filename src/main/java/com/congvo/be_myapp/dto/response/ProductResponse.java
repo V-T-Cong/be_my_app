@@ -21,8 +21,7 @@ public class ProductResponse {
     private boolean active;
     private String description;
     private String thumbnailUrl;
-    private BigDecimal finalPrice;
-    private String discountLabel;
+    private BigDecimal discountPercent;
     private List<VariantDTO> variants;
 
     public ProductResponse(Product product) {
@@ -32,6 +31,7 @@ public class ProductResponse {
         this.active = product.isActive();
         this.description = product.getDescription();
         this.thumbnailUrl = product.getThumbnailUrl();
+        this.discountPercent = product.getDiscountPercent();
         this.variants = product.getVariants().stream()
                 .map(variant -> {
                     VariantDTO dto = new VariantDTO();

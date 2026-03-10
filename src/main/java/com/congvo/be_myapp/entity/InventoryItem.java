@@ -34,4 +34,25 @@ public class InventoryItem extends BaseEntity{
     @Version
     private Long version;
 
+    public void markAsSold() {
+        if (this.status == InventoryStatus.SOLD) {
+            throw new IllegalStateException("Item is already sold!");
+        }
+        this.status = InventoryStatus.SOLD;
+        this.variant.sellItem();
+    }
+
+    public void updateStatus(InventoryStatus newStatus) {
+        if (this.status == newStatus) return;
+
+        if (this.status == InventoryStatus.AVAILABLE) {
+            this.variant.decreaseStock();
+        }
+        else if (newStatus == InventoryStatus.AVAILABLE) {
+            this.variant.increaseStock();
+        }
+
+        this.status = newStatus;
+    }
+
 }

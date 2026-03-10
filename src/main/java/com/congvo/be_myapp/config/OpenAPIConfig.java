@@ -19,7 +19,8 @@ public class OpenAPIConfig {
                         .title("Be My App API")
                         .version("1.0")
                         .description("API documentation for Be My App service")
-                        .license(new License().name("Apache 2.0").url("http://springdoc.org")))
+                        .license(new License().name("Apache 2.0").url("""
+                                https://springdoc.org""")))
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth",

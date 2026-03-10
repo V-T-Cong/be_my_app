@@ -10,6 +10,7 @@ import com.congvo.be_myapp.entity.ProductVariant;
 import com.congvo.be_myapp.repository.CategoryRepository;
 import com.congvo.be_myapp.repository.ProductRepository;
 import com.congvo.be_myapp.repository.ProductVariantRepository;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForBigDecimal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,10 +80,35 @@ public class ProductService {
         return new ProductResponse(savedProduct);
     }
 
+    @Transactional
+    public ProductResponse updateProduct(UUID productId,ProductRequest productRequest) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+
+        if (productRequest.getName() != null) {
+            product.setName(productRequest.getName());
+        }
+        if (productRequest.getSlug() != null) {
+            product.setSlug(productRequest.getSlug());
+        }
+        if (productRequest.getDescription() != null) {
+            product.setDescription(productRequest.getDescription());
+        }
+        if (productRequest.getThumbnailUrl() != null) {
+            product.setThumbnailUrl(productRequest.getThumbnailUrl());
+        }
+        if  (productRequest.getDiscountPercent() != null) {
+            product.setDiscountPercent(productRequest.getDiscountPercent());
+        }
+
+        productRepository.save(product);
+
+        return new ProductResponse(product);
+    }
+
 
     @Transactional
     public ProductResponse addVariantToProduct(UUID productId, VariantRequest variantRequest) {
-
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
 

@@ -68,22 +68,8 @@ public class InventoryService {
         InventoryItem item = inventoryItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Inventory Item not found"));
 
-        boolean stockNeedsUpdate = false;
-        ProductVariant variant = item.getVariant();
-
-        if (request.getStatus() != null && item.getStatus() != request.getStatus()) {
-
-            if (item.getStatus() == InventoryStatus.AVAILABLE) {
-                variant.setStockQuantity(variant.getStockQuantity() - 1);
-                stockNeedsUpdate = true;
-            }
-
-            else if (request.getStatus() == InventoryStatus.AVAILABLE) {
-                variant.setStockQuantity(variant.getStockQuantity() + 1);
-                stockNeedsUpdate = true;
-            }
-
-            item.setStatus(request.getStatus());
+        if (request.getStatus() != null) {
+            item.updateStatus(request.getStatus());
         }
 
         if (request.getSecretValue() != null && !request.getSecretValue().isBlank()) {
@@ -91,10 +77,6 @@ public class InventoryService {
         }
 
         inventoryItemRepository.save(item);
-
-        if (stockNeedsUpdate) {
-            variantRepository.save(variant);
-        }
     }
 
 }
