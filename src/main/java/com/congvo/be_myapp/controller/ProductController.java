@@ -60,7 +60,6 @@ public class ProductController {
     public ResponseEntity<ProductResponse> addVariantToProduct(
             @PathVariable UUID productId,
             @RequestBody VariantRequest request) {
-
         ProductResponse response = productService.addVariantToProduct(productId, request);
         return ResponseEntity.ok(response);
     }
