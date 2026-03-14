@@ -10,7 +10,6 @@ import com.congvo.be_myapp.entity.ProductVariant;
 import com.congvo.be_myapp.repository.CategoryRepository;
 import com.congvo.be_myapp.repository.ProductRepository;
 import com.congvo.be_myapp.repository.ProductVariantRepository;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForBigDecimal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,23 +23,23 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductVariantRepository variantRepository;
     private final CategoryRepository categoryRepository;
+    private final StorageService storageService;
 
     public ProductService(
             ProductRepository productRepository,
             ProductVariantRepository variantRepository,
-            CategoryRepository categoryRepository
+            CategoryRepository categoryRepository,
+            StorageService storageService
     ) {
         this.productRepository = productRepository;
         this.variantRepository = variantRepository;
         this.categoryRepository = categoryRepository;
+        this.storageService = storageService;
     }
 
-//    public List<Product> getAllProducts() {
-//        return productRepository.findAll();
-//    }
 
     @Transactional
-    public ProductResponse createProduct(ProductRequest productRequest) {
+    public ProductResponse createProduct(ProductRequest productRequest, org.springframework.web.multipart.MultipartFile imageFile) {
         if (productRepository.existsBySlug(productRequest.getSlug())) {
             throw new RuntimeException("Product with this slug already exists");
         }
@@ -52,6 +51,13 @@ public class ProductService {
         product.setThumbnailUrl(productRequest.getThumbnailUrl());
         product.setDiscountPercent(productRequest.getDiscountPercent());
         product.setActive(true);
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String imageUrl = storageService.uploadFile(imageFile);
+            product.setThumbnailUrl(imageUrl);
+        } else {
+            product.setThumbnailUrl(productRequest.getThumbnailUrl());
+        }
 
         if (productRequest.getCategoryIds() != null && !productRequest.getCategoryIds().isEmpty()) {
             Set<Category> categories = new HashSet<>(categoryRepository.findAllById(productRequest.getCategoryIds()));
@@ -100,12 +106,26 @@ public class ProductService {
         if  (productRequest.getDiscountPercent() != null) {
             product.setDiscountPercent(productRequest.getDiscountPercent());
         }
+        if (productRequest.getCategoryIds() != null) {
+            Set<Category> categories = new HashSet<>(categoryRepository.findAllById(productRequest.getCategoryIds()));
+            product.setCategories(categories);
+        }
 
         productRepository.save(product);
-
         return new ProductResponse(product);
     }
 
+    @Transactional
+    public ProductResponse addCategoriesToProduct(UUID productId, Set<UUID> categoryIds) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        List<Category> newCategories = categoryRepository.findAllById(categoryIds);
+        product.getCategories().addAll(newCategories);
+
+        productRepository.save(product);
+        return new ProductResponse(product);
+    }
 
     @Transactional
     public ProductResponse addVariantToProduct(UUID productId, VariantRequest variantRequest) {

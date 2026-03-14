@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -42,9 +43,12 @@ public class ProductController {
         return ResponseEntity.ok(new ProductResponse(product));
     }
 
-    @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest request) {
-        ProductResponse response = productService.createProduct(request);
+    @PostMapping(consumes = {"multipart/form-data"})
+    public ResponseEntity<ProductResponse> createProduct(
+            @RequestPart("product") ProductRequest request,
+            @RequestPart(value = "image", required = false) org.springframework.web.multipart.MultipartFile image
+    ) {
+        ProductResponse response = productService.createProduct(request, image);
         return ResponseEntity.ok(response);
     }
 
@@ -73,6 +77,14 @@ public class ProductController {
 
         String statusMessage = request.isActive() ? "activated" : "deactivated";
         return ResponseEntity.ok("Product variant has been " + statusMessage + " successfully.");
+    }
+
+    @PostMapping("/{productId}/categories")
+    public ResponseEntity<ProductResponse> addCategories(
+            @PathVariable UUID productId,
+            @RequestBody Set<UUID> categoryIds) {
+        ProductResponse response = productService.addCategoriesToProduct(productId, categoryIds);
+        return ResponseEntity.ok(response);
     }
 
 }
