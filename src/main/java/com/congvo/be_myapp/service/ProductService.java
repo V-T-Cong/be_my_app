@@ -12,11 +12,9 @@ import com.congvo.be_myapp.repository.ProductRepository;
 import com.congvo.be_myapp.repository.ProductVariantRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class ProductService {
@@ -39,7 +37,7 @@ public class ProductService {
 
 
     @Transactional
-    public ProductResponse createProduct(ProductRequest productRequest, org.springframework.web.multipart.MultipartFile imageFile) {
+    public ProductResponse createProduct(ProductRequest productRequest, List<MultipartFile> imageFiles) {
         if (productRepository.existsBySlug(productRequest.getSlug())) {
             throw new RuntimeException("Product with this slug already exists");
         }
@@ -48,16 +46,18 @@ public class ProductService {
         product.setName(productRequest.getName());
         product.setSlug(productRequest.getSlug());
         product.setDescription(productRequest.getDescription());
-        product.setThumbnailUrl(productRequest.getThumbnailUrl());
         product.setDiscountPercent(productRequest.getDiscountPercent());
         product.setActive(true);
 
-        if (imageFile != null && !imageFile.isEmpty()) {
-            String imageUrl = storageService.uploadFile(imageFile);
-            product.setThumbnailUrl(imageUrl);
-        } else {
-            product.setThumbnailUrl(productRequest.getThumbnailUrl());
+        List<String> uploadedUrls = new ArrayList<>();
+        if (imageFiles != null && !imageFiles.isEmpty()) {
+            for (MultipartFile file : imageFiles) {
+                if (!file.isEmpty()) {
+                    uploadedUrls.add(storageService.uploadFile(file));
+                }
+            }
         }
+        product.setImageUrls(uploadedUrls);
 
         if (productRequest.getCategoryIds() != null && !productRequest.getCategoryIds().isEmpty()) {
             Set<Category> categories = new HashSet<>(categoryRepository.findAllById(productRequest.getCategoryIds()));
@@ -99,9 +99,6 @@ public class ProductService {
         }
         if (productRequest.getDescription() != null) {
             product.setDescription(productRequest.getDescription());
-        }
-        if (productRequest.getThumbnailUrl() != null) {
-            product.setThumbnailUrl(productRequest.getThumbnailUrl());
         }
         if  (productRequest.getDiscountPercent() != null) {
             product.setDiscountPercent(productRequest.getDiscountPercent());

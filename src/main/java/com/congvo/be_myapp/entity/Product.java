@@ -27,7 +27,10 @@ public class Product extends BaseEntity {
     @Column(precision = 5, scale = 2)
     private BigDecimal discountPercent;
 
-    private String thumbnailUrl;
+    @ElementCollection
+    @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "image_url")
+    private List<String> imageUrls = new ArrayList<>();
 
     private boolean isActive = true;
 

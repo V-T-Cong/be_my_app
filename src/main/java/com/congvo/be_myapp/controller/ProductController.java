@@ -9,6 +9,7 @@ import com.congvo.be_myapp.repository.ProductRepository;
 import com.congvo.be_myapp.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Set;
@@ -46,9 +47,9 @@ public class ProductController {
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<ProductResponse> createProduct(
             @RequestPart("product") ProductRequest request,
-            @RequestPart(value = "image", required = false) org.springframework.web.multipart.MultipartFile image
+            @RequestPart(value = "images", required = false) List<MultipartFile> images
     ) {
-        ProductResponse response = productService.createProduct(request, image);
+        ProductResponse response = productService.createProduct(request, images);
         return ResponseEntity.ok(response);
     }
 

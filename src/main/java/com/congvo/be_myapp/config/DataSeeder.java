@@ -43,7 +43,7 @@ public class DataSeeder implements CommandLineRunner {
         this.variantRepository = variantRepository;
         this.inventoryRepository = inventoryRepository;
         this.categoryRepository = categoryRepository;
-        this.userRepository = userRepository; //
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -54,77 +54,54 @@ public class DataSeeder implements CommandLineRunner {
         seedCategories();
         seedProducts();
         seedAdminUser();
-        seedProducts();
     }
 
     private void seedAdminUser() {
-        String adminEmail = "admin@gmail.com"; //
+        String adminEmail = "admin@gmail.com";
 
-        if (userRepository.existsByEmail(adminEmail)) { //
+        if (userRepository.existsByEmail(adminEmail)) {
             return;
         }
 
-        System.out.println("Seeding Admin User..."); //
+        System.out.println("Seeding Admin User...");
 
         Role adminRole = roleRepository.findByName("ROLE_ADMIN")
-                .orElseThrow(() -> new RuntimeException("ROLE_ADMIN not found")); //
+                .orElseThrow(() -> new RuntimeException("ROLE_ADMIN not found"));
 
-        User admin = new User(); //
-        admin.setUsername("Administrator"); //
-        admin.setEmail(adminEmail); //
-        admin.setPhoneNumber("0000000000"); //
-        admin.setPassword(passwordEncoder.encode("admin@1234")); //
-        admin.setRoles(new HashSet<>(Collections.singletonList(adminRole))); //
+        User admin = new User();
+        admin.setUsername("Administrator");
+        admin.setEmail(adminEmail);
+        admin.setPhoneNumber("0000000000");
+        admin.setPassword(passwordEncoder.encode("admin@1234"));
+        admin.setRoles(new HashSet<>(Collections.singletonList(adminRole)));
 
-        userRepository.save(admin); //
+        userRepository.save(admin);
         System.out.println("Admin User created successfully!");
     }
 
     private void seedCategories() {
         if (categoryRepository.count() > 0) {
-            return; //
+            return;
         }
 
-        System.out.println("Seeding Category Data..."); //
+        System.out.println("Seeding Category Data...");
 
         List<Category> categories = List.of(
                 Category.builder().name("Operating Systems").description("Windows, Linux, and macOS licenses").color("#4A90E2").build(),
                 Category.builder().name("Streaming Services").description("Netflix, Hulu, Disney+, and more").color("#E50914").build(),
                 Category.builder().name("Office Tools").description("Productivity software like Microsoft Office and Adobe Acrobat").color("#D32F2F").build(),
                 Category.builder().name("Graphic Design").description("Tools for designers: Photoshop, Illustrator, Canva Pro").color("#9C27B0").build(),
-                Category.builder().name("Video Editing").description("Premiere Pro, Final Cut, and DaVinci Resolve").color("#673AB7").build(),
-                Category.builder().name("Gaming").description("Game keys, Steam credits, and digital deluxe editions").color("#FF9800").build(),
-                Category.builder().name("Music & Audio").description("Spotify, Apple Music, and DAW software").color("#1DB954").build(),
-                Category.builder().name("Antivirus & Security").description("Kaspersky, Norton, and McAfee licenses").color("#F44336").build(),
-                Category.builder().name("Cloud Storage").description("Google One, Dropbox, and iCloud storage plans").color("#2196F3").build(),
-                Category.builder().name("VPN Services").description("NordVPN, ExpressVPN, and Surfshark").color("#3F51B5").build(),
-                Category.builder().name("Educational Software").description("Language learning, coding bootcamps, and academic tools").color("#4CAF50").build(),
-                Category.builder().name("Development Tools").description("IDE licenses, GitHub Pro, and hosting credits").color("#333333").build(),
-                Category.builder().name("SEO & Marketing").description("Semrush, Ahrefs, and social media management tools").color("#FF5722").build(),
-                Category.builder().name("E-books & Reading").description("Kindle Unlimited, Scribd, and digital libraries").color("#795548").build(),
-                Category.builder().name("AI & Automation").description("ChatGPT Plus, Midjourney, and Zapier").color("#00BCD4").build(),
-                Category.builder().name("Project Management").description("Trello Gold, Asana, and Monday.com").color("#FFC107").build(),
-                Category.builder().name("Finance & Accounting").description("QuickBooks, Xero, and personal finance apps").color("#009688").build(),
-                Category.builder().name("Stock Media").description("Shutterstock, Envato Elements, and Freepik Premium").color("#8BC34A").build(),
-                Category.builder().name("Communication").description("Zoom Pro, Slack, and Discord Nitro").color("#7289DA").build(),
-                Category.builder().name("Utilities").description("System optimizers, file recovery, and compression tools").color("#607D8B").build(),
-                Category.builder().name("Mobile Apps").description("Premium Android and iOS applications").color("#A4C639").build(),
-                Category.builder().name("E-commerce").description("Shopify themes, plugins, and dropshipping tools").color("#95BF47").build(),
-                Category.builder().name("Web Hosting").description("Domain registration and server management").color("#FF4081").build(),
-                Category.builder().name("Cybersecurity Training").description("Courses and labs for ethical hacking").color("#263238").build(),
-                Category.builder().name("Fitness & Wellness").description("Workout apps and meditation subscriptions").color("#FF1744").build()
+                Category.builder().name("Gaming").description("Game keys, Steam credits, and digital deluxe editions").color("#FF9800").build()
         );
 
-        categoryRepository.saveAll(categories); //
+        categoryRepository.saveAll(categories);
     }
 
     private void seedRolesAndPermissions() {
-        // 1. Create Permissions
         Permission readUser = createPermissionIfNotFound("READ_USER");
         Permission writeUser = createPermissionIfNotFound("WRITE_USER");
         Permission deleteUser = createPermissionIfNotFound("DELETE_USER");
 
-        // 2. Create Roles
         Set<Permission> userPermissions = new HashSet<>();
         userPermissions.add(readUser);
         createRoleIfNotFound("ROLE_USER", userPermissions);
@@ -138,24 +115,21 @@ public class DataSeeder implements CommandLineRunner {
 
     private void seedProducts() {
         if (productRepository.count() > 0) {
-            return; // Data already exists
+            return;
         }
 
         System.out.println("Seeding Product Data...");
 
-        // ==========================================
         // PRODUCT 1: Windows 11 Pro
-        // ==========================================
         Product windows = Product.builder()
                 .name("Windows 11 Pro")
                 .slug("windows-11-pro")
                 .description("Lifetime license for Windows 11 Professional. Instant delivery via email.")
-                .thumbnailUrl("https://example.com/images/win11.jpg")
+                .imageUrls(List.of("https://example.com/images/win11-box.jpg", "https://example.com/images/win11-logo.jpg"))
                 .isActive(true)
                 .build();
         productRepository.save(windows);
 
-        // Variant: Retail Key
         ProductVariant winKeyVariant = ProductVariant.builder()
                 .product(windows)
                 .type(ProductType.KEY)
@@ -165,26 +139,22 @@ public class DataSeeder implements CommandLineRunner {
                 .build();
         variantRepository.save(winKeyVariant);
 
-        // Add Inventory for Windows
         inventoryRepository.saveAll(List.of(
                 createItem(winKeyVariant, "W11-AAAA-BBBB-CCCC-DDDD"),
                 createItem(winKeyVariant, "W11-EEEE-FFFF-GGGG-HHHH"),
                 createItem(winKeyVariant, "W11-IIII-JJJJ-KKKK-LLLL")
         ));
 
-        // ==========================================
         // PRODUCT 2: Netflix Premium
-        // ==========================================
         Product netflix = Product.builder()
                 .name("Netflix Premium (1 Month)")
                 .slug("netflix-premium-1-month")
                 .description("4K Ultra HD streaming. Supports 4 devices.")
-                .thumbnailUrl("https://example.com/images/netflix.jpg")
+                .imageUrls(List.of("https://example.com/images/netflix-main.jpg", "https://example.com/images/netflix-ui.jpg"))
                 .isActive(true)
                 .build();
         productRepository.save(netflix);
 
-        // Variant A: Shared Account (Cheaper)
         ProductVariant netflixShared = ProductVariant.builder()
                 .product(netflix)
                 .type(ProductType.SHARED_ACCOUNT)
@@ -194,26 +164,10 @@ public class DataSeeder implements CommandLineRunner {
                 .build();
         variantRepository.save(netflixShared);
 
-        // Inventory for Shared Account (JSON format for user/pass)
         inventoryRepository.saveAll(List.of(
                 createItem(netflixShared, "{\"u\":\"shared1@mail.com\",\"p\":\"pass123\",\"profile\":\"1\"}"),
                 createItem(netflixShared, "{\"u\":\"shared1@mail.com\",\"p\":\"pass123\",\"profile\":\"2\"}")
         ));
-
-        // Variant B: Private Account (Expensive)
-        ProductVariant netflixPrivate = ProductVariant.builder()
-                .product(netflix)
-                .type(ProductType.PRIVATE_ACCOUNT)
-                .variantName("Private Account (Full Access)")
-                .price(new BigDecimal("12.00"))
-                .stockQuantity(1)
-                .build();
-        variantRepository.save(netflixPrivate);
-
-        // Inventory for Private Account
-        inventoryRepository.save(
-                createItem(netflixPrivate, "{\"u\":\"private@mail.com\",\"p\":\"secretPass!\"}")
-        );
 
         System.out.println("Product Data Seeded Successfully!");
     }

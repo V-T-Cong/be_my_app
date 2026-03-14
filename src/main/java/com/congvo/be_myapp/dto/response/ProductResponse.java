@@ -22,8 +22,8 @@ public class ProductResponse {
     private String slug;
     private boolean active;
     private String description;
-    private String thumbnailUrl;
     private BigDecimal discountPercent;
+    private List<String> imageUrls;
     private Set<Category> categories;
     private List<VariantDTO> variants;
 
@@ -33,7 +33,7 @@ public class ProductResponse {
         this.slug = product.getSlug();
         this.active = product.isActive();
         this.description = product.getDescription();
-        this.thumbnailUrl = product.getThumbnailUrl();
+        this.imageUrls = product.getImageUrls();
         this.discountPercent = product.getDiscountPercent();
         this.categories = product.getCategories();
         this.variants = product.getVariants().stream()
